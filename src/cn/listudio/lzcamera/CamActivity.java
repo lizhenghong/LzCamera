@@ -18,6 +18,12 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 public class CamActivity extends Activity {
 
@@ -27,13 +33,17 @@ public class CamActivity extends Activity {
 	SurfaceHolder surfaceHolder;
 	Handler handler;
 	Timer timer;
-
+	ImageView imageView;
+	ViewGroup _root;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
-		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);
+		imageView = (ImageView)findViewById(R.id.focus_button);
+		imageView.getBackground().setAlpha(200);	
+		 _root = (ViewGroup) findViewById(R.id.cameraframe);  
 
+		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);		
 		surfaceView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -41,7 +51,8 @@ public class CamActivity extends Activity {
 				if (!isPreview) {
 					return true;
 				}
-
+				
+				
 				Camera.Parameters params = camera.getParameters();
 				params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 
@@ -49,7 +60,32 @@ public class CamActivity extends Activity {
 					return true;
 				}				
 				
-				if (event.getAction() == MotionEvent.ACTION_UP)
+			
+			//	imageView.
+				
+			//	if (event.getAction() == MotionEvent.ACTION_DOWN)
+			    {
+			        float x = event.getX();
+			        float y = event.getY();
+			        float touchMajor = event.getTouchMajor();
+			        float touchMinor = event.getTouchMinor();		    
+			        
+			        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) imageView.getLayoutParams();  
+			        int width = layoutParams.width;
+			        int height = layoutParams.height;
+
+			        layoutParams.leftMargin = (int)x;  
+			        layoutParams.topMargin = (int)y;  
+			         
+			        //layoutParams.rightMargin = layoutParams.leftMargin + width;  
+			         // layoutParams.bottomMargin = layoutParams.topMargin + height;  
+			        imageView.setLayoutParams(layoutParams);  			        
+			       imageView.setLayoutParams(layoutParams);  
+
+			       _root.invalidate();
+			    }
+				
+			    if (event.getAction() == MotionEvent.ACTION_UP)
 			    {
 			        float x = event.getX();
 			        float y = event.getY();
@@ -66,7 +102,6 @@ public class CamActivity extends Activity {
 			        Camera.Area cameraArea = new Camera.Area(rect,1000);
 					List<Camera.Area> listArea = new 	ArrayList<Camera.Area>();
 					listArea.add(cameraArea);
-
 					params.setFocusAreas(listArea);
 					camera.setParameters(params);
 					camera.autoFocus(null);
