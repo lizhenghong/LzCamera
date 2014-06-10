@@ -1,16 +1,23 @@
 package cn.listudio.lzcamera;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnTouchListener;
 
 public class CamActivity extends Activity {
 
@@ -26,8 +33,50 @@ public class CamActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
 		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);
-		surfaceHolder = surfaceView.getHolder();
 
+		surfaceView.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				if (!isPreview) {
+					return true;
+				}
+
+				Camera.Parameters params = camera.getParameters();
+				params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+
+				if (params.getMaxNumFocusAreas() == 0) {
+					return true;
+				}				
+				
+				if (event.getAction() == MotionEvent.ACTION_UP)
+			    {
+			        float x = event.getX();
+			        float y = event.getY();
+			        float touchMajor = event.getTouchMajor();
+			        float touchMinor = event.getTouchMinor();		    	
+			  
+			        Rect rect = new Rect();
+			        rect.set((int)((x - touchMajor/2)* 2000 / surfaceView.getWidth() - 1000),
+			        		(int)((y - touchMajor/2) * 2000 / surfaceView.getHeight() - 1000),
+			        		(int)((x + touchMajor/2) * 2000 / surfaceView.getWidth() - 1000),
+			        		(int)((y + touchMajor/2) * 2000 / surfaceView.getHeight() - 1000));
+
+			  //      Log.i("cameraArea rect","(" + rect.left + "," + rect.top + "," + rect.right + ","+ rect.bottom+")");
+			        Camera.Area cameraArea = new Camera.Area(rect,1000);
+					List<Camera.Area> listArea = new 	ArrayList<Camera.Area>();
+					listArea.add(cameraArea);
+
+					params.setFocusAreas(listArea);
+					camera.setParameters(params);
+					camera.autoFocus(null);
+			    }
+				
+				return true;
+			}
+		});
+
+		surfaceHolder = surfaceView.getHolder();
 		surfaceHolder.addCallback(new Callback() {
 			@Override
 			public void surfaceChanged(SurfaceHolder holder, int format,
@@ -57,9 +106,9 @@ public class CamActivity extends Activity {
 			public boolean handleMessage(Message msg) {
 				// TODO Auto-generated method stub
 
-				if (msg.what == 1) {
-					camera.autoFocus(null);
-				}
+				//if (msg.what == 1) {
+				//	camera.autoFocus(null);
+			//	}
 				return true;
 			}
 
