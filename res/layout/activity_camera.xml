@@ -3,9 +3,7 @@
     android:id="@+id/cameraframe"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-	
-    
+    android:orientation="vertical" >    
     
     <SurfaceView
         android:id="@+id/camera_surfaceView"
@@ -19,4 +17,20 @@
         android:layout_gravity="top|left"
         android:background="@drawable/focus_cursor" />
    
+    <FrameLayout
+        android:id="@+id/manipulate_frame"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom"
+        android:orientation="vertical" >
+
+        <ImageButton
+            android:id="@+id/imageButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/focus_cursor" />
+	
+	</FrameLayout>
+        
+    
 </FrameLayout>

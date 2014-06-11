@@ -185,10 +185,14 @@ public class CamActivity extends Activity {
 				public void onPictureTaken(byte[] data, Camera camera) {
 					
 				     String ExternalStorageDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath(); //SDCard Path
-				        String targetPath = ExternalStorageDirectoryPath + "/LzCamera/pictures/abc.jpg";
+				        String targetPath = ExternalStorageDirectoryPath + "/LzCamera/pictures/ssssssss.jpg";
+				        
+				       
 				        
 				        File targetFile = new File(targetPath);
 				    
+				   //     targetFile.listFiles()
+				        
 				        FileOutputStream outStream = null;
 						try {
 							// 打开指定文件对应的输出流
