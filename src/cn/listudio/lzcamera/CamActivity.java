@@ -1,17 +1,28 @@
 package cn.listudio.lzcamera;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.graphics.Bitmap.CompressFormat;
 import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
+import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -19,11 +30,10 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 public class CamActivity extends Activity {
 
@@ -35,6 +45,7 @@ public class CamActivity extends Activity {
 	Timer timer;
 	ImageView imageView;
 	ViewGroup _root;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,30 +61,21 @@ public class CamActivity extends Activity {
 				// TODO Auto-generated method stub
 				if (!isPreview) {
 					return true;
-				}
-				
+				}				
 				
 				Camera.Parameters params = camera.getParameters();
 				params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 
 				if (params.getMaxNumFocusAreas() == 0) {
 					return true;
-				}				
-				
+				}					
 			
-			//	imageView.
-				
-			//	if (event.getAction() == MotionEvent.ACTION_DOWN)
+				if (event.getAction() == MotionEvent.ACTION_DOWN)
 			    {
 			        float x = event.getX();
 			        float y = event.getY();
-			        float touchMajor = event.getTouchMajor();
-			        float touchMinor = event.getTouchMinor();		    
 			        
 			        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) imageView.getLayoutParams();  
-			        int width = layoutParams.width;
-			        int height = layoutParams.height;
-
 			        layoutParams.leftMargin = (int)x;  
 			        layoutParams.topMargin = (int)y;  
 			         
@@ -81,7 +83,6 @@ public class CamActivity extends Activity {
 			         // layoutParams.bottomMargin = layoutParams.topMargin + height;  
 			        imageView.setLayoutParams(layoutParams);  			        
 			       imageView.setLayoutParams(layoutParams);  
-
 			       _root.invalidate();
 			    }
 				
@@ -105,8 +106,7 @@ public class CamActivity extends Activity {
 					params.setFocusAreas(listArea);
 					camera.setParameters(params);
 					camera.autoFocus(null);
-			    }
-				
+			    }				
 				return true;
 			}
 		});
@@ -139,7 +139,6 @@ public class CamActivity extends Activity {
 		handler = new Handler(new Handler.Callback() {
 			@Override
 			public boolean handleMessage(Message msg) {
-				// TODO Auto-generated method stub
 
 				//if (msg.what == 1) {
 				//	camera.autoFocus(null);
@@ -149,10 +148,70 @@ public class CamActivity extends Activity {
 
 		});
 
-		timer = new Timer(true);
-		timer.schedule(task, 5000, 5000);
+	//	timer = new Timer(true);
+	//	timer.schedule(task, 5000, 5000);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {	
+			
+			camera.autoFocus(autoFocusCallback);
+			//camera.startPreview();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	AutoFocusCallback autoFocusCallback = new AutoFocusCallback()
+	{
+		@Override
+		public void onAutoFocus(boolean success, Camera camera) {
+			camera.takePicture(null, null, new  PictureCallback()
+			{
+				@Override
+				public void onPictureTaken(byte[] data, Camera camera) {
+					
+				     String ExternalStorageDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath(); //SDCard Path
+				        String targetPath = ExternalStorageDirectoryPath + "/LzCamera/pictures/abc.jpg";
+				        
+				        File targetFile = new File(targetPath);
+				    
+				        FileOutputStream outStream = null;
+						try {
+							// 打开指定文件对应的输出流
+							outStream = new FileOutputStream(targetFile);
+							// 把位图输出到指定文件中
+							Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
+									data.length);
+							bm.compress(CompressFormat.JPEG, 100, outStream);
+							outStream.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				        
+				       // 
+				        
+				    //    OutputStream stream = new OutputStream(targetDirector);
+				        camera.startPreview();
+				}
+			});
+		}
+		
+	};
+	
 	private void initCamera() {
 		if (!isPreview) {
 			// 此处默认打开后置摄像头。
@@ -163,18 +222,7 @@ public class CamActivity extends Activity {
 		if (camera != null && !isPreview) {
 			try {
 				Camera.Parameters parameters = camera.getParameters();
-				// 妈蛋不能用下面的设置，设置就报错，可能是手机不支持吧，所以lint才要强制加个try啊……
-				// 设置预览照片的大小
-				// parameters.setPreviewSize(100 ,200);
-				// 设置预览照片时每秒显示多少帧的最小值和最大值
-				// parameters.setPreviewFpsRange(4, 10);
-				// 设置图片格式
-				// parameters.setPictureFormat(ImageFormat.JPEG);
-				// 设置JPG照片的质量
-				// parameters.set("jpeg-quality", 85);
-				// 设置照片的大小
-				// parameters.setPictureSize(100, 200);
-				// 通过SurfaceView显示取景画面
+
 				camera.setParameters(parameters);
 				camera.setPreviewDisplay(surfaceHolder); // ②
 				// 开始预览
