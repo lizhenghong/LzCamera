@@ -43,15 +43,15 @@ public class CamActivity extends Activity {
 	SurfaceHolder surfaceHolder;
 	Handler handler;
 	Timer timer;
-	ImageView imageView;
+//	ImageView imageView;
 	ViewGroup _root;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
-		imageView = (ImageView)findViewById(R.id.focus_button);
-		imageView.getBackground().setAlpha(200);	
+	//	imageView = (ImageView)findViewById(R.id.focus_button);
+	//	imageView.getBackground().setAlpha(200);	
 		 _root = (ViewGroup) findViewById(R.id.cameraframe);  
 
 		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);		
@@ -75,14 +75,14 @@ public class CamActivity extends Activity {
 			        float x = event.getX();
 			        float y = event.getY();
 			        
-			        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) imageView.getLayoutParams();  
-			        layoutParams.leftMargin = (int)x;  
-			        layoutParams.topMargin = (int)y;  
+			   //     FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) imageView.getLayoutParams();  
+			  //      layoutParams.leftMargin = (int)x;  
+			   //     layoutParams.topMargin = (int)y;  
 			         
 			        //layoutParams.rightMargin = layoutParams.leftMargin + width;  
 			         // layoutParams.bottomMargin = layoutParams.topMargin + height;  
-			        imageView.setLayoutParams(layoutParams);  			        
-			       imageView.setLayoutParams(layoutParams);  
+			 //       imageView.setLayoutParams(layoutParams);  			        
+			  //     imageView.setLayoutParams(layoutParams);  
 			       _root.invalidate();
 			    }
 				

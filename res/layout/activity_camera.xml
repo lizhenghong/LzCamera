@@ -10,14 +10,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <ImageView
+    <!-- ImageView
         android:id="@+id/focus_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|left"
-        android:background="@drawable/focus_cursor" />
+        android:background="@drawable/focus_cursor" /-->
    
-    <FrameLayout
+    <cn.listudio.lzcamera.ForegroundView
+        android:id="@+id/foreground_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <!-- FrameLayout
         android:id="@+id/manipulate_frame"
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -30,7 +34,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/focus_cursor" />
 	
-	</FrameLayout>
+	</FrameLayout-->
         
     
 </FrameLayout>
