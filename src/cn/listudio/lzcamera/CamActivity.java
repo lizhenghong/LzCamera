@@ -38,30 +38,29 @@ import android.widget.Toast;
 public class CamActivity extends Activity {
 
 	SurfaceView surfaceView;
+	ForegroundView foregroundView;
 	Camera camera;
 	boolean isPreview = false;
 	SurfaceHolder surfaceHolder;
 	Handler handler;
 	Timer timer;
-//	ImageView imageView;
 	ViewGroup _root;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
-	//	imageView = (ImageView)findViewById(R.id.focus_button);
-	//	imageView.getBackground().setAlpha(200);	
-		 _root = (ViewGroup) findViewById(R.id.cameraframe);  
 
-		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);		
-		surfaceView.setOnTouchListener(new OnTouchListener() {
+		 _root = (ViewGroup) findViewById(R.id.cameraframe);  
+		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);
+		foregroundView = (ForegroundView)findViewById(R.id.foreground_view);
+		foregroundView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				// TODO Auto-generated method stub
 				if (!isPreview) {
 					return true;
-				}				
+				}
 				
 				Camera.Parameters params = camera.getParameters();
 				params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
@@ -73,17 +72,9 @@ public class CamActivity extends Activity {
 				if (event.getAction() == MotionEvent.ACTION_DOWN)
 			    {
 			        float x = event.getX();
-			        float y = event.getY();
-			        
-			   //     FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) imageView.getLayoutParams();  
-			  //      layoutParams.leftMargin = (int)x;  
-			   //     layoutParams.topMargin = (int)y;  
-			         
-			        //layoutParams.rightMargin = layoutParams.leftMargin + width;  
-			         // layoutParams.bottomMargin = layoutParams.topMargin + height;  
-			 //       imageView.setLayoutParams(layoutParams);  			        
-			  //     imageView.setLayoutParams(layoutParams);  
-			       _root.invalidate();
+			        float y = event.getY();	
+			        Rect rect = new Rect((int)x,(int)y,(int)x+50,(int)y+50);
+			        foregroundView.setFocusPoint(rect, ForegroundView.StateFocus.FOCUSED);
 			    }
 				
 			    if (event.getAction() == MotionEvent.ACTION_UP)
@@ -185,14 +176,9 @@ public class CamActivity extends Activity {
 				public void onPictureTaken(byte[] data, Camera camera) {
 					
 				     String ExternalStorageDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath(); //SDCard Path
-				        String targetPath = ExternalStorageDirectoryPath + "/LzCamera/pictures/ssssssss.jpg";
-				        
-				       
-				        
+				        String targetPath = ExternalStorageDirectoryPath + "/LzCamera/pictures/ssssssss.jpg";       
+
 				        File targetFile = new File(targetPath);
-				    
-				   //     targetFile.listFiles()
-				        
 				        FileOutputStream outStream = null;
 						try {
 							// 打开指定文件对应的输出流
@@ -205,10 +191,6 @@ public class CamActivity extends Activity {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-				        
-				       // 
-				        
-				    //    OutputStream stream = new OutputStream(targetDirector);
 				        camera.startPreview();
 				}
 			});
@@ -239,12 +221,12 @@ public class CamActivity extends Activity {
 	}
 
 	// 自动对焦不要只放在tiemr中，还要放在手动点击，或传感器检测手机运动幅度后。
-	TimerTask task = new TimerTask() {
+/*	TimerTask task = new TimerTask() {
 		public void run() {
 			Message message = new Message();
 			message.what = 1;
 			handler.sendMessage(message);
 		}
 	};
-
+*/
 }
