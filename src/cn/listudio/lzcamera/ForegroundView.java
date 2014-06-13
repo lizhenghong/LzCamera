@@ -5,6 +5,7 @@ import java.util.TimerTask;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -51,25 +52,36 @@ public class ForegroundView extends View {
 		{
 			Paint paint = new Paint();		
 			if(stateFocus == StateFocus.FOCUSING){
-				paint.setColor(0xfff8);
+				paint.setColor(Color.WHITE);
 				
 			}
 			else if(stateFocus == StateFocus.FOCUSED){
-				paint.setColor(0x0f08);
+				paint.setColor(Color.GREEN);
 				//timer
 			}
 			else if(stateFocus == StateFocus.FOCUSFAIL){
-				paint.setColor(0xf008);
+				paint.setColor(Color.RED);
 				//timer
 			}
-			canvas.drawRect(rect, paint);
-		}
-		
-		Paint paint1 = new Paint();		
-		canvas.drawLine(33, 66, 99, 123, paint1);
-		canvas.drawRect(rect, paint1);
-	}
+			int rectWidth = rect.width();
+			int len = rect.width() / 3;
+			canvas.drawLine(rect.left,rect.top,rect.left+ len,rect.top,paint);
+			canvas.drawLine(rect.right-len,rect.top,rect.right,rect.top,paint);
+			
+			canvas.drawLine(rect.left,rect.bottom,rect.left+ len,rect.bottom,paint);
+			canvas.drawLine(rect.right-len,rect.bottom,rect.right,rect.bottom,paint);
+			
+			canvas.drawLine(rect.left,rect.top,rect.left,rect.top+len,paint);
+			canvas.drawLine(rect.left,rect.bottom,rect.left,rect.bottom-len,paint);
+			
+			canvas.drawLine(rect.right,rect.top,rect.right,rect.top+len,paint);
+			canvas.drawLine(rect.right,rect.bottom,rect.right,rect.bottom-len,paint);
 
+			canvas.drawLine(rect.left+len/2,rect.top+ rectWidth/2, rect.right-len/2,rect.top+ rectWidth/2,paint);
+			canvas.drawLine(rect.left+ rectWidth/2,rect.top+len/2,rect.left+ rectWidth/2,rect.bottom-len/2,paint);
+
+		}
+	}
 
 	TimerTask timerTask = new TimerTask()
 	{

@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,12 +46,13 @@ public class CamActivity extends Activity {
 	Handler handler;
 	Timer timer;
 	ViewGroup _root;
-
+	DisplayMetrics metrics;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
-
+		metrics = getResources().getDisplayMetrics();
 		 _root = (ViewGroup) findViewById(R.id.cameraframe);  
 		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);
 		foregroundView = (ForegroundView)findViewById(R.id.foreground_view);
@@ -68,36 +70,42 @@ public class CamActivity extends Activity {
 				if (params.getMaxNumFocusAreas() == 0) {
 					return true;
 				}					
-			
-				if (event.getAction() == MotionEvent.ACTION_DOWN)
-			    {
-			        float x = event.getX();
-			        float y = event.getY();	
-			        Rect rect = new Rect((int)x,(int)y,(int)x+50,(int)y+50);
-			        foregroundView.setFocusPoint(rect, ForegroundView.StateFocus.FOCUSED);
-			    }
 				
-			    if (event.getAction() == MotionEvent.ACTION_UP)
+				if (event.getAction() == MotionEvent.ACTION_DOWN
+						|| event.getAction() == MotionEvent.ACTION_UP)
 			    {
-			        float x = event.getX();
-			        float y = event.getY();
-			        float touchMajor = event.getTouchMajor();
-			        float touchMinor = event.getTouchMinor();		    	
-			  
-			        Rect rect = new Rect();
-			        rect.set((int)((x - touchMajor/2)* 2000 / surfaceView.getWidth() - 1000),
-			        		(int)((y - touchMajor/2) * 2000 / surfaceView.getHeight() - 1000),
-			        		(int)((x + touchMajor/2) * 2000 / surfaceView.getWidth() - 1000),
-			        		(int)((y + touchMajor/2) * 2000 / surfaceView.getHeight() - 1000));
+			        int x = (int)(event.getX());
+			        int y = (int)event.getY();	
+			        int rectWidth = metrics.widthPixels/4;
+			        Rect pixelRect =new  Rect(x-rectWidth/2,y-rectWidth/2,x+rectWidth/2,y+rectWidth/2);	
+			        if(pixelRect.left <0) pixelRect.offset( - pixelRect.left, 0);
+			        if(pixelRect.top < 0) pixelRect.offset(0,  - pixelRect.top);
+			        if(pixelRect.right > surfaceView.getWidth()) pixelRect.offset(surfaceView.getWidth() - pixelRect.right, 0);
+			        if(pixelRect.bottom >surfaceView.getHeight()) pixelRect.offset(0,surfaceView.getHeight() - pixelRect.bottom);
+			        
+			        foregroundView.setFocusPoint(pixelRect, ForegroundView.StateFocus.FOCUSING);
+		
+			        if (event.getAction() == MotionEvent.ACTION_UP) //begin focus
+				    {				    				  
+				        Rect cameraRect = new Rect(pixelRect);
+				        cameraRect.left = cameraRect.left*2000/surfaceView.getWidth()-1000;
+				        cameraRect.right = cameraRect.right*2000/surfaceView.getWidth()-1000;
+				        cameraRect.top = cameraRect.top*2000/surfaceView.getHeight()-1000;
+				        cameraRect.bottom= cameraRect.bottom*2000/surfaceView.getHeight()-1000;
 
-			  //      Log.i("cameraArea rect","(" + rect.left + "," + rect.top + "," + rect.right + ","+ rect.bottom+")");
-			        Camera.Area cameraArea = new Camera.Area(rect,1000);
-					List<Camera.Area> listArea = new 	ArrayList<Camera.Area>();
-					listArea.add(cameraArea);
-					params.setFocusAreas(listArea);
-					camera.setParameters(params);
-					camera.autoFocus(null);
-			    }				
+				        if(cameraRect.left < -1000) cameraRect.offset(-1000 - cameraRect.left, 0);
+				        if(cameraRect.top < -1000) cameraRect.offset(0, -1000 - cameraRect.top);
+				        if(cameraRect.right > 1000) cameraRect.offset(1000 - cameraRect.right, 0);
+				        if(cameraRect.bottom >1000) cameraRect.offset(0,1000 - cameraRect.bottom);
+				        
+				        Camera.Area cameraArea = new Camera.Area(cameraRect,1000);
+						List<Camera.Area> listArea = new 	ArrayList<Camera.Area>();
+						listArea.add(cameraArea);
+						params.setFocusAreas(listArea);
+						camera.setParameters(params);
+						camera.autoFocus(null);
+				    }				
+			    }	
 				return true;
 			}
 		});
