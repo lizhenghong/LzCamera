@@ -38,15 +38,19 @@ import android.widget.Toast;
 
 public class CamActivity extends Activity {
 
+	final int MESSAGEFOCUS = 0x0001;
 	SurfaceView surfaceView;
 	ForegroundView foregroundView;
 	Camera camera;
 	boolean isPreview = false;
 	SurfaceHolder surfaceHolder;
 	Handler handler;
-	Timer timer;
+
 	ViewGroup _root;
 	DisplayMetrics metrics;
+	Rect pixelRect;//对焦区域，以pixel为单位
+	// 自动对焦不要只放在tiemr中，还要放在手动点击，或传感器检测手机运动幅度后。
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,7 @@ public class CamActivity extends Activity {
 		 _root = (ViewGroup) findViewById(R.id.cameraframe);  
 		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);
 		foregroundView = (ForegroundView)findViewById(R.id.foreground_view);
+
 		foregroundView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -77,14 +82,13 @@ public class CamActivity extends Activity {
 			        int x = (int)(event.getX());
 			        int y = (int)event.getY();	
 			        int rectWidth = metrics.widthPixels/4;
-			        Rect pixelRect =new  Rect(x-rectWidth/2,y-rectWidth/2,x+rectWidth/2,y+rectWidth/2);	
+			        pixelRect =new  Rect(x-rectWidth/2,y-rectWidth/2,x+rectWidth/2,y+rectWidth/2);	
 			        if(pixelRect.left <0) pixelRect.offset( - pixelRect.left, 0);
 			        if(pixelRect.top < 0) pixelRect.offset(0,  - pixelRect.top);
 			        if(pixelRect.right > surfaceView.getWidth()) pixelRect.offset(surfaceView.getWidth() - pixelRect.right, 0);
 			        if(pixelRect.bottom >surfaceView.getHeight()) pixelRect.offset(0,surfaceView.getHeight() - pixelRect.bottom);
 			        
-			        foregroundView.setFocusPoint(pixelRect, ForegroundView.StateFocus.FOCUSING);
-		
+			        
 			        if (event.getAction() == MotionEvent.ACTION_UP) //begin focus
 				    {				    				  
 				        Rect cameraRect = new Rect(pixelRect);
@@ -103,7 +107,8 @@ public class CamActivity extends Activity {
 						listArea.add(cameraArea);
 						params.setFocusAreas(listArea);
 						camera.setParameters(params);
-						camera.autoFocus(null);
+						foregroundView.setFocusPoint(pixelRect, ForegroundView.StateFocus.FOCUSING);
+						camera.autoFocus(autoFocusCallback);
 				    }				
 			    }	
 				return true;
@@ -134,22 +139,23 @@ public class CamActivity extends Activity {
 				}
 			}
 		});
-
+		
+				
 		handler = new Handler(new Handler.Callback() {
 			@Override
 			public boolean handleMessage(Message msg) {
 
-				//if (msg.what == 1) {
-				//	camera.autoFocus(null);
-			//	}
+				if (msg.what == MESSAGEFOCUS) {
+					foregroundView.setFocusPoint(pixelRect, ForegroundView.StateFocus.FOCUSDONE);
+				}
 				return true;
 			}
 
 		});
 
-	//	timer = new Timer(true);
-	//	timer.schedule(task, 5000, 5000);
+
 	}
+	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,14 +173,14 @@ public class CamActivity extends Activity {
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {	
 			
-			camera.autoFocus(autoFocusCallback);
+			camera.autoFocus(autoFocusTakePictureCallback);
 			//camera.startPreview();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 	
-	AutoFocusCallback autoFocusCallback = new AutoFocusCallback()
+	AutoFocusCallback autoFocusTakePictureCallback = new AutoFocusCallback()
 	{
 		@Override
 		public void onAutoFocus(boolean success, Camera camera) {
@@ -202,8 +208,33 @@ public class CamActivity extends Activity {
 				        camera.startPreview();
 				}
 			});
+		}		
+	};
+	
+	
+	AutoFocusCallback autoFocusCallback = new AutoFocusCallback()
+	{
+		@Override
+		public void onAutoFocus(boolean success, Camera camera) {
+			
+			if(success){
+				foregroundView.setFocusPoint(pixelRect, ForegroundView.StateFocus.FOCUSED);
+			}
+			else{
+				foregroundView.setFocusPoint(pixelRect, ForegroundView.StateFocus.FOCUSFAIL);
+			}
+	
+
+			Timer timer = new Timer(true);
+			timer.schedule(new TimerTask() {
+				public void run() {
+					Message message = new Message();
+					message.what = MESSAGEFOCUS;
+					handler.sendMessage(message);					
+				}
+			}
+			, 2000);
 		}
-		
 	};
 	
 	private void initCamera() {
@@ -228,13 +259,6 @@ public class CamActivity extends Activity {
 		}
 	}
 
-	// 自动对焦不要只放在tiemr中，还要放在手动点击，或传感器检测手机运动幅度后。
-/*	TimerTask task = new TimerTask() {
-		public void run() {
-			Message message = new Message();
-			message.what = 1;
-			handler.sendMessage(message);
-		}
-	};
-*/
+	
+
 }
