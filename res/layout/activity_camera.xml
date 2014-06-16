@@ -9,32 +9,25 @@
         android:id="@+id/camera_surfaceView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <!-- ImageView
-        android:id="@+id/focus_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|left"
-        android:background="@drawable/focus_cursor" /-->
-   
+ 
     <cn.listudio.lzcamera.ForegroundView
         android:id="@+id/foreground_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    <!-- FrameLayout
-        android:id="@+id/manipulate_frame"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_gravity="bottom"
-        android:orientation="vertical" >
-
-        <ImageButton
-            android:id="@+id/imageButton1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/focus_cursor" />
-	
-	</FrameLayout-->
-        
+        android:layout_height="match_parent"/>  
     
+    
+     <ImageView
+        android:id="@+id/thumbnail_view"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom|left"
+        />
+    
+    <ImageButton
+        android:id="@+id/shot_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:background="@drawable/shot_button" />
+   
 </FrameLayout>

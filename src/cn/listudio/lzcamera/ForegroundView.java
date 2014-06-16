@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class ForegroundView extends View {
@@ -39,6 +40,7 @@ public class ForegroundView extends View {
 		invalidate();
 	}	
 
+	
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -83,14 +85,9 @@ public class ForegroundView extends View {
 		}
 	}
 
-	TimerTask timerTask = new TimerTask()
-	{
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			stateFocus = StateFocus.FOCUSDONE;
-			invalidate();
-		}		
-	};
-	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		// TODO Auto-generated method stub
+		return super.onTouchEvent(event);
+	}	
 }

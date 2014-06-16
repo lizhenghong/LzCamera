@@ -29,17 +29,21 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 public class CamActivity extends Activity {
 
 	final int MESSAGEFOCUS = 0x0001;
+
 	SurfaceView surfaceView;
+	ImageView thumbNailImgView;
 	ForegroundView foregroundView;
 	Camera camera;
 	boolean isPreview = false;
@@ -49,7 +53,6 @@ public class CamActivity extends Activity {
 	DisplayMetrics metrics;
 	Rect pixelRect;//对焦区域，以pixel为单位
 	private MyTimerTask timerTask;
-	// 自动对焦不要只放在tiemr中，还要放在手动点击，或传感器检测手机运动幅度后。
 	
 	
 	@Override
@@ -60,6 +63,7 @@ public class CamActivity extends Activity {
 		 _root = (ViewGroup) findViewById(R.id.cameraframe);  
 		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);
 		foregroundView = (ForegroundView)findViewById(R.id.foreground_view);
+		thumbNailImgView = (ImageView)findViewById(R.id.thumbnail_view);
 		timerTask = new MyTimerTask();
 		foregroundView.setOnTouchListener(new OnTouchListener() {
 			@Override
@@ -87,8 +91,7 @@ public class CamActivity extends Activity {
 			        if(pixelRect.top < 0) pixelRect.offset(0,  - pixelRect.top);
 			        if(pixelRect.right > surfaceView.getWidth()) pixelRect.offset(surfaceView.getWidth() - pixelRect.right, 0);
 			        if(pixelRect.bottom >surfaceView.getHeight()) pixelRect.offset(0,surfaceView.getHeight() - pixelRect.bottom);
-			        
-			        
+					        
 			        if (event.getAction() == MotionEvent.ACTION_UP) //begin focus
 				    {				    				  
 				        Rect cameraRect = new Rect(pixelRect);
@@ -106,15 +109,28 @@ public class CamActivity extends Activity {
 						List<Camera.Area> listArea = new 	ArrayList<Camera.Area>();
 						listArea.add(cameraArea);
 						params.setFocusAreas(listArea);
+						params.setMeteringAreas(listArea);
+						params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
 						camera.setParameters(params);
 						foregroundView.setFocusPoint(pixelRect, ForegroundView.StateFocus.FOCUSING);
 						camera.autoFocus(autoFocusCallback);
+						
 				    }				
 			    }	
 				return true;
 			}
 		});
-
+		
+		ImageButton imageButton = (ImageButton)findViewById(R.id.shot_button);
+		imageButton.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				camera.autoFocus(autoFocusTakePictureCallback);
+			}
+			
+		});
 		surfaceHolder = surfaceView.getHolder();
 		surfaceHolder.addCallback(new Callback() {
 			@Override
@@ -152,8 +168,6 @@ public class CamActivity extends Activity {
 			}
 
 		});
-
-
 	}
 	
 	
@@ -202,6 +216,10 @@ public class CamActivity extends Activity {
 									data.length);
 							bm.compress(CompressFormat.JPEG, 100, outStream);
 							outStream.close();
+							
+							thumbNailImgView.setImageBitmap(bm);
+							
+							
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
