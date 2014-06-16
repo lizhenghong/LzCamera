@@ -45,10 +45,10 @@ public class CamActivity extends Activity {
 	boolean isPreview = false;
 	SurfaceHolder surfaceHolder;
 	Handler handler;
-
 	ViewGroup _root;
 	DisplayMetrics metrics;
 	Rect pixelRect;//对焦区域，以pixel为单位
+	private MyTimerTask timerTask;
 	// 自动对焦不要只放在tiemr中，还要放在手动点击，或传感器检测手机运动幅度后。
 	
 	
@@ -60,7 +60,7 @@ public class CamActivity extends Activity {
 		 _root = (ViewGroup) findViewById(R.id.cameraframe);  
 		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);
 		foregroundView = (ForegroundView)findViewById(R.id.foreground_view);
-
+		timerTask = new MyTimerTask();
 		foregroundView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -222,21 +222,24 @@ public class CamActivity extends Activity {
 			}
 			else{
 				foregroundView.setFocusPoint(pixelRect, ForegroundView.StateFocus.FOCUSFAIL);
-			}
+			}			
 	
-
-			Timer timer = new Timer(true);
-			timer.schedule(new TimerTask() {
-				public void run() {
-					Message message = new Message();
-					message.what = MESSAGEFOCUS;
-					handler.sendMessage(message);					
-				}
-			}
-			, 2000);
+			Timer timer = new Timer(true);		
+			if(timerTask!= null)
+				timerTask.cancel();
+			timerTask = new MyTimerTask();			
+			timer.schedule(timerTask, 2000);
 		}
 	};
-	
+		
+	class MyTimerTask extends TimerTask {
+		public void run() {
+			Message message = new Message();
+			message.what = MESSAGEFOCUS;
+			handler.sendMessage(message);					
+		}
+	};
+
 	private void initCamera() {
 		if (!isPreview) {
 			// 此处默认打开后置摄像头。
