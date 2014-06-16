@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -40,25 +41,39 @@ import android.widget.Toast;
 
 public class CamActivity extends Activity {
 
-	final int MESSAGEFOCUS = 0x0001;
+	//some define 
+	public static final int MESSAGEFOCUS = 0x0001;
+	public static final String PREFS_NAME = "PREFES_NAME";
+	public static final String PREFS_KEY_PREFIX = "LZ";
+	public static final String PREFS_KEY_SEQUENCE = "SEQ";
 
+	//data related
+	SharedPreferences preferences;
+	SharedPreferences.Editor prefEditor;
+
+	boolean isPreview = false;
+	Handler handler;
+	DisplayMetrics metrics;
+	Rect pixelRect;//对焦区域，以pixel为单位
+	private MyTimerTask timerTask;
+	
+	//UI & Views
 	SurfaceView surfaceView;
 	ImageView thumbNailImgView;
 	ForegroundView foregroundView;
 	Camera camera;
-	boolean isPreview = false;
-	SurfaceHolder surfaceHolder;
-	Handler handler;
+	SurfaceHolder surfaceHolder;	
 	ViewGroup _root;
-	DisplayMetrics metrics;
-	Rect pixelRect;//对焦区域，以pixel为单位
-	private MyTimerTask timerTask;
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
+		
+		preferences = getSharedPreferences(PREFS_NAME,0);
+		prefEditor = preferences.edit();
+		
 		metrics = getResources().getDisplayMetrics();
 		 _root = (ViewGroup) findViewById(R.id.cameraframe);  
 		surfaceView = (SurfaceView) findViewById(R.id.camera_surfaceView);
@@ -155,8 +170,7 @@ public class CamActivity extends Activity {
 				}
 			}
 		});
-		
-				
+						
 		handler = new Handler(new Handler.Callback() {
 			@Override
 			public boolean handleMessage(Message msg) {
@@ -201,12 +215,20 @@ public class CamActivity extends Activity {
 			camera.takePicture(null, null, new  PictureCallback()
 			{
 				@Override
-				public void onPictureTaken(byte[] data, Camera camera) {
+				public void onPictureTaken(byte[] data, Camera camera) {					
+				
+					int order = preferences.getInt(PREFS_KEY_SEQUENCE, 0);
+					String targetFileName = String.format("%s%04d%s",preferences.getString(PREFS_KEY_PREFIX, "LZ_"), 
+							order,
+							".jpg");
+					order++;
+					prefEditor.putInt(PREFS_KEY_SEQUENCE, order);
+					prefEditor.commit();
 					
-				     String ExternalStorageDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath(); //SDCard Path
-				        String targetPath = ExternalStorageDirectoryPath + "/LzCamera/pictures/ssssssss.jpg";       
+					String ExternalStorageDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath(); //SDCard Path
+				       String targetPath = ExternalStorageDirectoryPath + "/LzCamera/pictures/";       
 
-				        File targetFile = new File(targetPath);
+				        File targetFile = new File(targetPath+targetFileName);
 				        FileOutputStream outStream = null;
 						try {
 							// 打开指定文件对应的输出流
@@ -215,10 +237,8 @@ public class CamActivity extends Activity {
 							Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
 									data.length);
 							bm.compress(CompressFormat.JPEG, 100, outStream);
-							outStream.close();
-							
-							thumbNailImgView.setImageBitmap(bm);
-							
+							outStream.close();							
+							thumbNailImgView.setImageBitmap(bm);							
 							
 						} catch (IOException e) {
 							e.printStackTrace();
