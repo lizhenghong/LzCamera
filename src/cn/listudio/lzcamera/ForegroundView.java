@@ -1,4 +1,4 @@
-package cn.listudio.lzcamera;
+锘縫ackage cn.listudio.lzcamera;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,7 +18,7 @@ public class ForegroundView extends View {
 	StateFocus stateFocus;
 	
 	
-	//如果是在xml中声明此控件，则必须有次构造函数，否则运行不起来，记住喽啊
+	//濡傛灉鏄湪xml涓０鏄庢鎺т欢锛屽垯蹇呴』鏈夋鏋勯�犲嚱鏁帮紝鍚﹀垯杩愯涓嶈捣鏉ワ紝璁颁綇鍠藉晩
 	public ForegroundView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		rect = new Rect(0,0,0,0);

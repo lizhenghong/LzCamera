@@ -1,4 +1,4 @@
-package cn.listudio.lzcamera;
+ï»¿package cn.listudio.lzcamera;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,7 +54,7 @@ public class CamActivity extends Activity {
 	boolean isPreview = false;
 	Handler handler;
 	DisplayMetrics metrics;
-	Rect pixelRect;//¶Ô½¹ÇøÓò£¬ÒÔpixelÎªµ¥Î»
+	Rect pixelRect;//å¯¹ç„¦åŒºåŸŸï¼Œä»¥pixelä¸ºå•ä½
 	private MyTimerTask timerTask;
 	
 	//UI & Views
@@ -155,13 +155,13 @@ public class CamActivity extends Activity {
 
 			@Override
 			public void surfaceCreated(SurfaceHolder holder) {
-				// ´ò¿ªÉãÏñÍ·
+				// æ‰“å¼€æ‘„åƒå¤´
 				initCamera();
 			}
 
 			@Override
 			public void surfaceDestroyed(SurfaceHolder holder) {
-				// Èç¹ûcamera²»Îªnull ,ÊÍ·ÅÉãÏñÍ·
+				// å¦‚æœcameraä¸ä¸ºnull ,é‡Šæ”¾æ‘„åƒå¤´
 				if (camera != null) {
 					if (isPreview)
 						camera.stopPreview();
@@ -231,9 +231,9 @@ public class CamActivity extends Activity {
 				        File targetFile = new File(targetPath+targetFileName);
 				        FileOutputStream outStream = null;
 						try {
-							// ´ò¿ªÖ¸¶¨ÎÄ¼ş¶ÔÓ¦µÄÊä³öÁ÷
+							// æ‰“å¼€æŒ‡å®šæ–‡ä»¶å¯¹åº”çš„è¾“å‡ºæµ
 							outStream = new FileOutputStream(targetFile);
-							// °ÑÎ»Í¼Êä³öµ½Ö¸¶¨ÎÄ¼şÖĞ
+							// æŠŠä½å›¾è¾“å‡ºåˆ°æŒ‡å®šæ–‡ä»¶ä¸­
 							Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
 									data.length);
 							bm.compress(CompressFormat.JPEG, 100, outStream);
@@ -280,9 +280,9 @@ public class CamActivity extends Activity {
 
 	private void initCamera() {
 		if (!isPreview) {
-			// ´Ë´¦Ä¬ÈÏ´ò¿ªºóÖÃÉãÏñÍ·¡£
-			// Í¨¹ı´«Èë²ÎÊı¿ÉÒÔ´ò¿ªÇ°ÖÃÉãÏñÍ·
-			camera = Camera.open(0); // ¢Ù
+			// æ­¤å¤„é»˜è®¤æ‰“å¼€åç½®æ‘„åƒå¤´ã€‚
+			// é€šè¿‡ä¼ å…¥å‚æ•°å¯ä»¥æ‰“å¼€å‰ç½®æ‘„åƒå¤´
+			camera = Camera.open(0); // â‘ 
 			camera.setDisplayOrientation(90);
 		}
 		if (camera != null && !isPreview) {
@@ -290,9 +290,9 @@ public class CamActivity extends Activity {
 				Camera.Parameters parameters = camera.getParameters();
 
 				camera.setParameters(parameters);
-				camera.setPreviewDisplay(surfaceHolder); // ¢Ú
-				// ¿ªÊ¼Ô¤ÀÀ
-				camera.startPreview(); // ¢Û
+				camera.setPreviewDisplay(surfaceHolder); // â‘¡
+				// å¼€å§‹é¢„è§ˆ
+				camera.startPreview(); // â‘¢
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -1,4 +1,4 @@
-package cn.listudio.lzcamera;
+﻿package cn.listudio.lzcamera;
 
 import android.app.Activity;
 import android.app.ActionBar;
