@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +17,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.os.Build;
 
 /**
@@ -74,14 +78,31 @@ public class MainActivity extends Activity {
 			View rootView = inflater.inflate(R.layout.fragment_main, container,
 					false);
 
-			Button button = (Button) rootView.findViewById(R.id.button_camera);
-			button.setOnClickListener(new OnClickListener() {
+			Button buttonCamera = (Button) rootView.findViewById(R.id.button_camera);
+			Button buttonSetAlarm = (Button) rootView.findViewById(R.id.button_setalarm);
+			
+			buttonCamera.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(),CamActivity.class);
 					getActivity().startActivity(intent);
 				}
 			});
-
+			
+			buttonSetAlarm.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					Intent intent = new Intent(getActivity(),CamActivity.class);
+					//getActivity().startActivity(intent);
+					AlarmManager alarmManager = (AlarmManager)getActivity().getSystemService(Service.ALARM_SERVICE);
+					PendingIntent pi = PendingIntent.getActivity(
+							getActivity(), 0, intent, 0);
+					alarmManager.setRepeating( AlarmManager.RTC_WAKEUP, 10000, 6*60000, pi) ;
+					
+					Toast.makeText(getActivity(), "AlarmManager设置成功啦"
+							, Toast.LENGTH_SHORT).show();
+				}
+			});
+			
+			
 			return rootView;
 		}
 	}

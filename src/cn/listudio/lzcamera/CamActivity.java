@@ -161,6 +161,7 @@ public class CamActivity extends Activity {
 			public void surfaceCreated(SurfaceHolder holder) {
 				// 打开摄像头
 				initCamera();
+				camera.autoFocus(autoFocusTakePictureCallback);
 			}
 
 			@Override
@@ -186,12 +187,12 @@ public class CamActivity extends Activity {
 			}
 
 		});
+		
 	}
 	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
@@ -203,9 +204,8 @@ public class CamActivity extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {	
-			
-			camera.autoFocus(autoFocusTakePictureCallback);
+		if (id == R.id.action_settings) {				
+			//camera.autoFocus(autoFocusTakePictureCallback);
 			//camera.startPreview();
 			return true;
 		}
@@ -247,6 +247,7 @@ public class CamActivity extends Activity {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
+						finish();
 				        camera.startPreview();
 				}
 			});
@@ -302,6 +303,27 @@ public class CamActivity extends Activity {
 			}
 			isPreview = true;
 		}
+	}
+
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+	
+	}
+
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onStart()
+	 */
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
 	}
 
 	

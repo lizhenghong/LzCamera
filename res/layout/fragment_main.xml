@@ -16,5 +16,11 @@
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:text="@string/button_camera" />
+    
+    <Button
+        android:id = "@+id/button_setalarm"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_setalarm" />
 
 </LinearLayout>
