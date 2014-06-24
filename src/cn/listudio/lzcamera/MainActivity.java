@@ -49,8 +49,9 @@ public class MainActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			Intent intent = new Intent(this,CamActivity.class);
-			
+			Intent intent = new Intent();//(this,CamActivity.class);
+			intent.setAction("android.media.action.STILL_IMAGE_CAMERA"); 
+
 			//	CamActivity camActivity = new CamActivity()
 			
 				startActivity(intent);
@@ -77,9 +78,6 @@ public class MainActivity extends Activity {
 			button.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(),CamActivity.class);
-					
-				//	CamActivity camActivity = new CamActivity()
-					
 					getActivity().startActivity(intent);
 				}
 			});

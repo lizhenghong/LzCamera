@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -71,6 +72,9 @@ public class CamActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
 		
+		ActionBar bar = getActionBar();
+		 bar.hide();
+		
 		preferences = getSharedPreferences(PREFS_NAME,0);
 		prefEditor = preferences.edit();
 		
@@ -90,7 +94,7 @@ public class CamActivity extends Activity {
 				
 				Camera.Parameters params = camera.getParameters();
 				params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-
+				params.setRotation(90);
 				if (params.getMaxNumFocusAreas() == 0) {
 					return true;
 				}					
